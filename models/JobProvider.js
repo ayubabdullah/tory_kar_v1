@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-// const geocoder = require("../utils/geocoder");
+const geocoder = require("../utils/geocoder");
 
 const JobProviderSchema = new mongoose.Schema(
   {
@@ -41,23 +41,24 @@ const JobProviderSchema = new mongoose.Schema(
       required: [true, "Please add a photo"],
       defualt: "no-image.jpg",
     },
-    // location: {
-    //   // GeoJSON Point
-    //   type: {
-    //     type: String,
-    //     enum: ["Point"],
-    //   },
-    //   coordinates: {
-    //     type: [Number],
-    //     index: "2dsphere",
-    //   },
-    //   formattedAddress: String,
-    //   street: String,
-    //   city: String,
-    //   state: String,
-    //   zipcode: String,
-    //   country: String,
-    // },
+    address: {
+      type: String,
+      required: [true, "Please add an address"],
+    },
+    location: {
+      // GeoJSON Point
+      type: {
+        type: String,
+        enum: ["Point"],
+      },
+      coordinates: {
+        type: [Number],
+        index: "2dsphere",
+      },
+      formattedAddress: String,
+      state: String,
+      country: String,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -81,23 +82,20 @@ JobProviderSchema.pre("save", function (next) {
 });
 
 // Geocode & create location field
-// JobProviderSchema.pre("save", async function (next) {
-//   const loc = await geocoder.geocode(this.address);
-//   this.location = {
-//     type: "Point",
-//     coordinates: [loc[0].longitude, loc[0].latitude],
-//     formattedAddress: loc[0].formattedAddress,
-//     street: loc[0].streetName,
-//     city: loc[0].city,
-//     state: loc[0].stateCode,
-//     zipcode: loc[0].zipcode,
-//     country: loc[0].countryCode,
-//   };
+JobProviderSchema.pre("save", async function (next) {
+  const loc = await geocoder.geocode(this.address);
+  this.location = {
+    type: "Point",
+    coordinates: [loc[0].longitude, loc[0].latitude],
+    formattedAddress: loc[0].formattedAddress,
+    state: loc[0].stateCode,
+    country: loc[0].countryCode,
+  };
 
-//   // Do not save address in DB
-//   this.address = undefined;
-//   next();
-// });
+  // Do not save address in DB
+  this.address = undefined;
+  next();
+});
 
 // Cascade delete provided job when a jobprovider is deleted
 JobProviderSchema.pre("remove", async function (next) {

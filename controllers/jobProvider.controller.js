@@ -193,3 +193,25 @@ exports.jobProviderPhotoUpload = asyncHandler(async (req, res, next) => {
     });
   });
 });
+
+// @desc      Get jobProviders within a radius
+// @route     GET /api/v1/jobproviders/radius/:lat/:lng/:distance
+// @access    Private
+exports.getJobProvidersInRadius = asyncHandler(async (req, res, next) => {
+  const { lat, lng, distance } = req.params;
+
+  // Calc radius using radians
+  // Divide dist by radius of Earth
+  // Earth Radius = 3,963 mi / 6,378 km
+  const radius = distance / 6378;
+
+  const jobProviders = await JobProvider.find({
+    location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+  });
+
+  res.status(200).json({
+    success: true,
+    count: jobProviders.length,
+    data: jobProviders
+  });
+});

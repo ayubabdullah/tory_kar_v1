@@ -6,6 +6,7 @@ const {
   updateJobProvider,
   deleteJobProvider,
   jobProviderPhotoUpload,
+  getJobProvidersInRadius,
 } = require("../controllers/jobProvider.controller");
 
 const JobProvider = require("../models/JobProvider");
@@ -21,6 +22,7 @@ const { protect } = require("../middlewares/authHandler");
 // Re-route into other resource routers
 router.use("/:jobProviderId/jobs", jobRouter);
 
+router.route("/radius/:lat/:lng/:distance").get(getJobProvidersInRadius);
 
 router.route("/:id/photo").put(protect, jobProviderPhotoUpload);
 
