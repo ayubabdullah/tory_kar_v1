@@ -58,7 +58,17 @@ exports.getJob = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/jobproviders/:jobProviderId/jobs
 // @access    Private
 exports.addJob = asyncHandler(async (req, res, next) => {
+  const jobProvider = await JobProvider.findById(req.params.jobProviderId);
+  if (!jobProvider) {
+    return next(
+      new ErrorResponse(
+        `No jobProvider with the id of ${req.params.jobProviderId}`,
+        404
+      )
+    );
+  }
   req.body.jobProvider = req.params.jobProviderId;
+  req.body.address = jobProvider.address;
 
   const job = await Job.create(req.body);
 
@@ -151,5 +161,27 @@ exports.deleteJob = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {},
+  });
+});
+
+// @desc      Get Jobs within a radius
+// @route     GET /api/v1/jobs/radius/:lat/:lng/:distance
+// @access    Private
+exports.getJobsInRadius = asyncHandler(async (req, res, next) => {
+  const { lat, lng, distance } = req.params;
+
+  // Calc radius using radians
+  // Divide dist by radius of Earth
+  // Earth Radius = 3,963 mi / 6,378 km
+  const radius = distance / 6378;
+
+  const jobs = await Job.find({
+    location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+  });
+
+  res.status(200).json({
+    success: true,
+    count: jobs.length,
+    data: jobs,
   });
 });
