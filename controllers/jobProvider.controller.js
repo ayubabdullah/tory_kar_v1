@@ -21,7 +21,10 @@ exports.getJobProvider = asyncHandler(async (req, res, next) => {
 
   if (!jobProvider) {
     return next(
-      new ErrorResponse(`JobProvider not found with id of ${req.params.id}`, 404)
+      new ErrorResponse(
+        `JobProvider not found with id of ${req.params.id}`,
+        404
+      )
     );
   }
 
@@ -32,16 +35,26 @@ exports.getJobProvider = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/jobproviders
 // @access    Private
 exports.createJobProvider = asyncHandler(async (req, res, next) => {
-    const jobSeeker = await JobSeeker.findOne({ user: req.user.id });
+  const user = await User.findById(req.user.id);
+  // Check for user account
+  if (!user) {
+    return next(
+      new ErrorResponse(`The user with ID ${req.user.id} doesn't exist`, 400)
+    );
+  }
+  // Check is user account verified
+  if (!user.isVerified) {
+    return next(
+      new ErrorResponse(`The user with ID ${req.user.id} not verified yet`, 400)
+    );
+  }
+  const jobSeeker = await JobSeeker.findOne({ user: req.user.id });
 
-    if (jobSeeker) {
-      return next(
-        new ErrorResponse(
-          `User with id: ${req.user.id} is a jobSeeker`,
-          404
-        )
-      );
-    }
+  if (jobSeeker) {
+    return next(
+      new ErrorResponse(`User with id: ${req.user.id} is a jobSeeker`, 404)
+    );
+  }
   // Add user to req.body
   req.body.user = req.user.id;
 
@@ -59,7 +72,10 @@ exports.createJobProvider = asyncHandler(async (req, res, next) => {
   }
 
   const jobProvider = await JobProvider.create(req.body);
-
+  if (jobProvider.email) {
+    user.email = jobProvider.email;
+    await user.save();
+  }
   res.status(201).json({
     success: true,
     data: jobProvider,
@@ -74,12 +90,18 @@ exports.updateJobProvider = asyncHandler(async (req, res, next) => {
 
   if (!jobProvider) {
     return next(
-      new ErrorResponse(`JobProvider not found with id of ${req.params.id}`, 404)
+      new ErrorResponse(
+        `JobProvider not found with id of ${req.params.id}`,
+        404
+      )
     );
   }
 
   // Make sure user is jobProvider owner
-  if (jobProvider.user.toString() !== req.user.id && req.user.role !== "admin") {
+  if (
+    jobProvider.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to update this jobProvider`,
@@ -104,12 +126,18 @@ exports.deleteJobProvider = asyncHandler(async (req, res, next) => {
 
   if (!jobProvider) {
     return next(
-      new ErrorResponse(`JobProvider not found with id of ${req.params.id}`, 404)
+      new ErrorResponse(
+        `JobProvider not found with id of ${req.params.id}`,
+        404
+      )
     );
   }
 
   // Make sure user is jobProvider owner
-  if (jobProvider.user.toString() !== req.user.id && req.user.role !== "admin") {
+  if (
+    jobProvider.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to delete this jobProvider`,
@@ -118,13 +146,16 @@ exports.deleteJobProvider = asyncHandler(async (req, res, next) => {
     );
   }
 
-  unlink(`${process.env.FILE_UPLOAD_PATH}/${jobProvider.profileImage}`, (err) => {
-    if (err) {
-      console.error(err);
-      return;
+  unlink(
+    `${process.env.FILE_UPLOAD_PATH}/${jobProvider.profileImage}`,
+    (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log("image removed from upload folder");
     }
-    console.log("image removed from upload folder");
-  });
+  );
 
   await jobProvider.remove();
 
@@ -139,12 +170,18 @@ exports.jobProviderPhotoUpload = asyncHandler(async (req, res, next) => {
 
   if (!jobProvider) {
     return next(
-      new ErrorResponse(`JobProvider not found with id of ${req.params.id}`, 404)
+      new ErrorResponse(
+        `JobProvider not found with id of ${req.params.id}`,
+        404
+      )
     );
   }
 
   // Make sure user is jobProvider owner
-  if (jobProvider.user.toString() !== req.user.id && req.user.role !== "admin") {
+  if (
+    jobProvider.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to update this jobProvider`,
@@ -191,27 +228,5 @@ exports.jobProviderPhotoUpload = asyncHandler(async (req, res, next) => {
       success: true,
       data: file.name,
     });
-  });
-});
-
-// @desc      Get jobProviders within a radius
-// @route     GET /api/v1/jobproviders/radius/:lat/:lng/:distance
-// @access    Private
-exports.getJobProvidersInRadius = asyncHandler(async (req, res, next) => {
-  const { lat, lng, distance } = req.params;
-
-  // Calc radius using radians
-  // Divide dist by radius of Earth
-  // Earth Radius = 3,963 mi / 6,378 km
-  const radius = distance / 6378;
-
-  const jobProviders = await JobProvider.find({
-    location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
-  });
-
-  res.status(200).json({
-    success: true,
-    count: jobProviders.length,
-    data: jobProviders
   });
 });

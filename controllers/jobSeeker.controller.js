@@ -1,8 +1,8 @@
 const path = require("path");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
-//const geocoder = require("../utils/geocoder");
 const JobSeeker = require("../models/JobSeeker");
+const User = require("../models/User");
 const { unlink } = require("fs");
 
 // @desc      Get all jobSeekers
@@ -31,6 +31,22 @@ exports.getJobSeeker = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/jobseekers
 // @access    Private
 exports.createJobSeeker = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  // Check for user account
+  if (!user) {
+    return next(
+      new ErrorResponse(
+        `The user with ID ${req.user.id} doesn't exist`,
+        400
+      )
+    );
+  }
+  // Check is user account verified
+  if (!user.isVerified) {
+    return next(
+      new ErrorResponse(`The user with ID ${req.user.id} not verified yet`, 400)
+    );
+  }
   // Add user to req.body
   req.body.user = req.user.id;
 
@@ -48,7 +64,11 @@ exports.createJobSeeker = asyncHandler(async (req, res, next) => {
   }
 
   const jobSeeker = await JobSeeker.create(req.body);
-
+  if (jobSeeker.email) {
+    user.email = jobSeeker.email;
+    await user.save();
+  }
+ 
   res.status(201).json({
     success: true,
     data: jobSeeker,

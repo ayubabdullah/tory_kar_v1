@@ -163,25 +163,3 @@ exports.deleteJob = asyncHandler(async (req, res, next) => {
     data: {},
   });
 });
-
-// @desc      Get Jobs within a radius
-// @route     GET /api/v1/jobs/radius/:lat/:lng/:distance
-// @access    Private
-exports.getJobsInRadius = asyncHandler(async (req, res, next) => {
-  const { lat, lng, distance } = req.params;
-
-  // Calc radius using radians
-  // Divide dist by radius of Earth
-  // Earth Radius = 3,963 mi / 6,378 km
-  const radius = distance / 6378;
-
-  const jobs = await Job.find({
-    location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
-  });
-
-  res.status(200).json({
-    success: true,
-    count: jobs.length,
-    data: jobs,
-  });
-});

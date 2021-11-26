@@ -5,7 +5,6 @@ const {
   addJob,
   updateJob,
   deleteJob,
-  getJobsInRadius,
 } = require("../controllers/job.controller");
 
 const Job = require("../models/Job");
@@ -20,7 +19,7 @@ const { protect } = require("../middlewares/authHandler");
 // Re-route into other resource routers
 router.use("/:jobId/applications", applicationRouter);
 
-router.route("/radius/:lat/:lng/:distance").get(getJobsInRadius);
+
 
 router
   .route("/")

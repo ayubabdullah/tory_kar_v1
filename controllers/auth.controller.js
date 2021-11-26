@@ -3,12 +3,13 @@ const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const sendEmail = require("../utils/sendEmail");
 const User = require("../models/User");
+const sendSMS = require("../utils/sendSMS");
+const checkSMS = require("../utils/checkSMS");
 
 // @desc      Register user
 // @route     POST /api/v1/auth/register
 // @access    Public
 exports.register = asyncHandler(async (req, res, next) => {
-
   // Create user
   const user = await User.create(req.body);
 
@@ -75,7 +76,6 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/auth/updatedetails
 // @access    Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
-
   const user = await User.findById(req.user.id);
 
   user.name = req.body.name;
@@ -105,74 +105,116 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+// @desc      Send SMS Verification
+// @route     POST /api/v1/auth/sendsms
+// @access    Private
+exports.sendSMS = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ phone: req.body.phone });
+
+  if (!user) {
+    return next(
+      new ErrorResponse(`There is no user with phone: ${req.body.phone}`, 404)
+    );
+  }
+  try {
+    await sendSMS({ phone: req.body.phone });
+    res.status(200).json({ success: true, data: "SMS sent" });
+  } catch (err) {
+    console.log(err);
+    return next(new ErrorResponse("SMS could not be sent", 500));
+  }
+});
+
+// @desc      Check SMS Verification
+// @route     POST /api/v1/auth/checksms
+// @access    Private
+exports.checkSMS = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ phone: req.body.phone });
+
+  if (!user) {
+    return next(
+      new ErrorResponse(`There is no user with phone: ${req.body.phone}`, 404)
+    );
+  }
+  try {
+    await checkSMS({ phone: req.body.phone, code: req.body.code });
+    user.isVerified = true;
+
+    await user.save();
+    res.status(200).json({ success: true, data: "Code verified" });
+  } catch (err) {
+    console.log(err);
+    return next(new ErrorResponse("Code not verified", 500));
+  }
+});
 // @desc      Forgot password
 // @route     POST /api/v1/auth/forgotpassword
 // @access    Public
-// exports.forgotPassword = asyncHandler(async (req, res, next) => {
-//   const user = await User.findOne({ email: req.body.email });
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
 
-//   if (!user) {
-//     return next(new ErrorResponse("There is no user with that email", 404));
-//   }
+  if (!user) {
+    return next(new ErrorResponse("There is no user with that email", 404));
+  }
 
-//   // Get reset token
-//   const resetToken = user.getResetPasswordToken();
+  // Get reset token
+  const resetToken = user.getResetPasswordToken();
 
-//   await user.save({ validateBeforeSave: false });
+  await user.save({ validateBeforeSave: false });
 
-//   // Create reset url
-//   const resetUrl = `${req.protocol}://${req.get(
-//     "host"
-//   )}/api/v1/auth/resetpassword/${resetToken}`;
+  // Create reset url
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/auth/resetpassword/${resetToken}`;
 
-//   const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
-//   try {
-//     await sendEmail({
-//       email: user.email,
-//       subject: "Password reset token",
-//       message,
-//     });
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password reset token",
+      message,
+    });
 
-//     res.status(200).json({ success: true, data: "Email sent" });
-//   } catch (err) {
-//     console.log(err);
-//     user.resetPasswordToken = undefined;
-//     user.resetPasswordExpire = undefined;
+    res.status(200).json({ success: true, data: "Email sent" });
+  } catch (err) {
+    console.log(err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
 
-//     await user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
 
-//     return next(new ErrorResponse("Email could not be sent", 500));
-//   }
-// });
+    return next(new ErrorResponse("Email could not be sent", 500));
+  }
+});
 
 // @desc      Reset password
 // @route     PUT /api/v1/auth/resetpassword/:resettoken
 // @access    Public
-// exports.resetPassword = asyncHandler(async (req, res, next) => {
-//   // Get hashed token
-//   const resetPasswordToken = crypto
-//     .createHash("sha256")
-//     .update(req.params.resettoken)
-//     .digest("hex");
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resettoken)
+    .digest("hex");
 
-//   const user = await User.findOne({
-//     resetPasswordToken,
-//     resetPasswordExpire: { $gt: Date.now() },
-//   });
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
 
-//   if (!user) {
-//     return next(new ErrorResponse("Invalid token", 400));
-//   }
+  if (!user) {
+    return next(new ErrorResponse("Invalid token", 400));
+  }
 
-//   // Set new password
-//   user.password = req.body.password;
-//   user.resetPasswordToken = undefined;
-//   user.resetPasswordExpire = undefined;
-//   await user.save();
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
 
-//   sendTokenResponse(user, 200, res);
-// });
+  sendTokenResponse(user, 200, res);
+});
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
