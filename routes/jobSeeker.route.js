@@ -7,6 +7,7 @@ const {
   deleteJobSeeker,
   jobSeekerPhotoUpload,
   jobSeekerCvUpload,
+  deleteJobSeekerCv,
 } = require("../controllers/jobSeeker.controller");
 
 const JobSeeker = require("../models/JobSeeker");
@@ -27,6 +28,7 @@ const { protect } = require("../middlewares/authHandler");
 
 router.route("/:id/photo").put(protect, jobSeekerPhotoUpload);
 router.route("/:id/cv").put(protect, jobSeekerCvUpload);
+router.route("/:id/cv/:cv").delete(protect, deleteJobSeekerCv);
 
 router
   .route("/")

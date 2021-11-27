@@ -124,25 +124,19 @@ exports.deleteJobSeeker = asyncHandler(async (req, res, next) => {
       )
     );
   }
-readdir(
-  `${process.env.FILE_UPLOAD_PATH}/cv`,
-  (err, files) => {
+  readdir(`${process.env.FILE_UPLOAD_PATH}/cv`, (err, files) => {
     files.forEach((file) => {
       if (file.startsWith(`cv_${jobSeeker._id}`)) {
-        unlink(
-          `${process.env.FILE_UPLOAD_PATH}/cv/${file}`,
-          (err) => {
-            if (err) {
-              console.error(err);
-              return;
-            }
-            console.log("cv removed from cv folder");
+        unlink(`${process.env.FILE_UPLOAD_PATH}/cv/${file}`, (err) => {
+          if (err) {
+            console.error(err);
+            return;
           }
-        );
+          console.log("cv removed from cv folder");
+        });
       }
     });
-  }
-);
+  });
   unlink(`${process.env.FILE_UPLOAD_PATH}/${jobSeeker.profileImage}`, (err) => {
     if (err) {
       console.error(err);
@@ -152,6 +146,46 @@ readdir(
   });
 
   await jobSeeker.remove();
+
+  res.status(200).json({ success: true, data: {} });
+});
+
+// @desc      Delete jobSeeker Specific CV
+// @route     DELETE /api/v1/jobseekers/:id/cv/:cv
+// @access    Private
+exports.deleteJobSeekerCv = asyncHandler(async (req, res, next) => {
+  const jobSeeker = await JobSeeker.findById(req.params.id);
+
+  if (!jobSeeker) {
+    return next(
+      new ErrorResponse(`JobSeeker not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure user is jobSeeker owner
+  if (jobSeeker.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete cv to this jobSeeker`,
+        401
+      )
+    );
+  }
+  const CVs = jobSeeker.CVs.filter((cv) => cv !== req.params.cv);
+
+  await JobSeeker.findByIdAndUpdate(req.params.id, {
+    CVs,
+  });
+
+    unlink(`${process.env.FILE_UPLOAD_PATH}/cv/${req.params.cv}`, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log("cv removed from cv folder");
+    });
+
+    
 
   res.status(200).json({ success: true, data: {} });
 });
