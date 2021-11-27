@@ -27,7 +27,7 @@ router.route("/:id/photo").put(protect, jobProviderPhotoUpload);
 
 router
   .route("/")
-  .get(advancedResults(JobProvider, 'jobs'), getJobProviders)
+  .get(advancedResults(JobProvider, ['jobs','user']), getJobProviders)
   .post(protect, createJobProvider);
 
 router

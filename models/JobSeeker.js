@@ -121,4 +121,12 @@ JobSeekerSchema.virtual("applications", {
   justOne: false,
 });
 
+// Reverse populate with virtuals
+JobSeekerSchema.virtual("alerts", {
+  ref: "Alert",
+  localField: "_id",
+  foreignField: "jobSeeker",
+  justOne: false,
+});
+
 module.exports = mongoose.model("JobSeeker", JobSeekerSchema);

@@ -40,6 +40,7 @@ const auth = require("./routes/auth.route");
  const jobProvider = require("./routes/jobProvider.route");
  const application = require("./routes/application.route");
  const job = require("./routes/job.route");
+ const alert = require("./routes/alert.route");
 
 // Body parser
 app.use(express.json());
@@ -88,5 +89,6 @@ app.use("/api/v1/auth", auth);
  app.use("/api/v1/jobproviders", jobProvider);
  app.use("/api/v1/applications", application);
  app.use("/api/v1/jobs", job);
+ app.use("/api/v1/alerts", alert);
 
 app.use(errorHandler);

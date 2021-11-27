@@ -17,7 +17,11 @@ exports.getJobSeekers = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/jobseekers/:id
 // @access    Public
 exports.getJobSeeker = asyncHandler(async (req, res, next) => {
-  const jobSeeker = await JobSeeker.findById(req.params.id);
+  const jobSeeker = await JobSeeker.findById(req.params.id).populate([
+    "applications",
+    "alerts",
+    "user",
+  ]);
 
   if (!jobSeeker) {
     return next(
@@ -177,15 +181,13 @@ exports.deleteJobSeekerCv = asyncHandler(async (req, res, next) => {
     CVs,
   });
 
-    unlink(`${process.env.FILE_UPLOAD_PATH}/cv/${req.params.cv}`, (err) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      console.log("cv removed from cv folder");
-    });
-
-    
+  unlink(`${process.env.FILE_UPLOAD_PATH}/cv/${req.params.cv}`, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log("cv removed from cv folder");
+  });
 
   res.status(200).json({ success: true, data: {} });
 });
@@ -217,8 +219,8 @@ exports.jobSeekerCvUpload = asyncHandler(async (req, res, next) => {
   }
 
   const file = req.files.file;
-  console.log(file);
-  // Make sure the image is a photo
+
+  // Make sure the file is a pdf
   if (!file.mimetype.includes("application/pdf")) {
     return next(new ErrorResponse(`Please upload an pdf file`, 400));
   }

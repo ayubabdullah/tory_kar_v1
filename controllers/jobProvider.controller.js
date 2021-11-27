@@ -17,7 +17,10 @@ exports.getJobProviders = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/jobproviders/:id
 // @access    Public
 exports.getJobProvider = asyncHandler(async (req, res, next) => {
-  const jobProvider = await JobProvider.findById(req.params.id);
+  const jobProvider = await JobProvider.findById(req.params.id).populate([
+    "jobs",
+    "user",
+  ]);
 
   if (!jobProvider) {
     return next(
