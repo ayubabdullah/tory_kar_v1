@@ -41,6 +41,7 @@ const auth = require("./routes/auth.route");
  const application = require("./routes/application.route");
  const job = require("./routes/job.route");
  const alert = require("./routes/alert.route");
+ const notification = require("./routes/notification.route");
 
 // Body parser
 app.use(express.json());
@@ -90,5 +91,6 @@ app.use("/api/v1/auth", auth);
  app.use("/api/v1/applications", application);
  app.use("/api/v1/jobs", job);
  app.use("/api/v1/alerts", alert);
+ app.use("/api/v1/notifications", notification);
 
 app.use(errorHandler);

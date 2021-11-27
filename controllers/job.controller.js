@@ -2,6 +2,9 @@ const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const JobProvider = require("../models/JobProvider");
 const Job = require("../models/Job");
+const Alert = require("../models/Alert");
+const Notification = require("../models/Notification");
+const { addNotification } = require("./notification.controller");
 
 // @desc      Get jobs
 // @route     GET /api/v1/jobs
@@ -71,6 +74,11 @@ exports.addJob = asyncHandler(async (req, res, next) => {
   req.body.address = jobProvider.address;
 
   const job = await Job.create(req.body);
+
+  const alerts = await Alert.find({ title: job.title });
+  alerts.forEach(alert => {
+    addNotification(alert.jobSeeker, job._id)
+  })
 
   res.status(200).json({
     success: true,
