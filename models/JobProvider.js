@@ -59,6 +59,10 @@ const JobProviderSchema = new mongoose.Schema(
       state: String,
       country: String,
     },
+    isApproved: {
+      type: Boolean,
+      defualt: false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
