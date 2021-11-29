@@ -6,6 +6,7 @@ const {
   updateJobProvider,
   deleteJobProvider,
   jobProviderPhotoUpload,
+  approveJobProvider,
 } = require("../controllers/jobProvider.controller");
 
 const JobProvider = require("../models/JobProvider");
@@ -21,19 +22,18 @@ const { protect } = require("../middlewares/authHandler");
 // Re-route into other resource routers
 router.use("/:jobProviderId/jobs", jobRouter);
 
-
-
 router.route("/:id/photo").put(protect, jobProviderPhotoUpload);
 
 router
   .route("/")
-  .get(advancedResults(JobProvider, ['jobs','user']), getJobProviders)
+  .get(advancedResults(JobProvider, ["jobs", "user"]), getJobProviders)
   .post(protect, createJobProvider);
 
 router
   .route("/:id")
   .get(getJobProvider)
   .put(protect, updateJobProvider)
+  .put(protect, approveJobProvider)
   .delete(protect, deleteJobProvider);
 
 module.exports = router;

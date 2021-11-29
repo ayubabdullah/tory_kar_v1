@@ -233,3 +233,25 @@ exports.jobProviderPhotoUpload = asyncHandler(async (req, res, next) => {
     });
   });
 });
+
+// @desc      Approve jobProvider
+// @route     PUT /api/v1/jobproviders/:id/approve
+// @access    Private
+exports.approveJobProvider = asyncHandler(async (req, res, next) => {
+  let jobProvider = await JobProvider.findById(req.params.id);
+
+  if (!jobProvider) {
+    return next(
+      new ErrorResponse(
+        `JobProvider not found with id of ${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  await JobProvider.findByIdAndUpdate(req.params.id, { isApproved: true });
+
+  res
+    .status(200)
+    .json({ success: true, data: `jobProvider ${req.params.id} is approved` });
+});
