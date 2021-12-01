@@ -20,7 +20,7 @@ const JobSeeker = require("../models/JobSeeker");
 const router = express.Router();
 
 const advancedResults = require("../middlewares/advancedResults");
-const { protect } = require("../middlewares/authHandler");
+const { protect, authorize } = require("../middlewares/authHandler");
 
 // Re-route into other resource routers
  router.use("/:jobId/applications", applicationRouter);
