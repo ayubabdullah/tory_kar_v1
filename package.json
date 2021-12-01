@@ -4,8 +4,7 @@
   "description": "Tori Kar backend Api",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server",
-    "build": "NODE_ENV=production node server"
+    "start": "nodemon server"
   },
   "author": "Ayub Abdullah",
   "license": "MIT",
