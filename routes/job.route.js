@@ -14,12 +14,10 @@ const applicationRouter = require("./application.route");
 const router = express.Router({ mergeParams: true });
 
 const advancedResults = require("../middlewares/advancedResults");
-const { protect } = require("../middlewares/authHandler");
+const { protect, authorize } = require("../middlewares/authHandler");
 
 // Re-route into other resource routers
 router.use("/:jobId/applications", applicationRouter);
-
-
 
 router
   .route("/")
@@ -30,12 +28,12 @@ router
     }),
     getJobs
   )
-  .post(protect, addJob);
+  .post(protect, authorize("jobProvider"), addJob);
 
 router
   .route("/:id")
   .get(getJob)
-  .put(protect, updateJob)
-  .delete(protect, deleteJob);
+  .put(protect, authorize("jobProvider"), updateJob)
+  .delete(protect, authorize("jobProvider"), deleteJob);
 
 module.exports = router;

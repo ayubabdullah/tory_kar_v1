@@ -13,7 +13,7 @@ const router = express.Router({ mergeParams: true });
 
 const advancedResults = require("../middlewares/advancedResults");
 const { protect } = require("../middlewares/authHandler");
-
+router.use(protect);
 router
   .route("/")
   .get(
@@ -23,12 +23,12 @@ router
     }),
     getApplications
   )
-  .post(protect, addApplication);
+  .post(authorize("jobSeeker"), addApplication);
 
 router
   .route("/:id")
   .get(getApplication)
-  .put(protect, updateApplication)
-  .delete(protect, deleteApplication);
+  .put(authorize("jobSeeker"), updateApplication)
+  .delete(authorize("jobSeeker"), deleteApplication);
 
 module.exports = router;

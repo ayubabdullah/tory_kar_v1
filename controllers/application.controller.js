@@ -57,7 +57,7 @@ exports.getApplication = asyncHandler(async (req, res, next) => {
 });
 
 // @desc      Add application
-// @route     POST /api/v1/jobs/jobsId/applications
+// @route     POST /api/v1/jobs/jobId/applications
 // @access    Private
 exports.addApplication = asyncHandler(async (req, res, next) => {
   const jobSeeker = await JobSeeker.findOne({user: req.user.id});

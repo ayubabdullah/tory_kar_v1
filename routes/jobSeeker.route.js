@@ -28,19 +28,28 @@ const { protect } = require("../middlewares/authHandler");
  router.use("/:jobSeekerId/notifications", notificationRouter);
 
 
-router.route("/:id/photo").put(protect, jobSeekerPhotoUpload);
-router.route("/:id/cv").put(protect, jobSeekerCvUpload);
-router.route("/:id/cv/:cv").delete(protect, deleteJobSeekerCv);
+router
+  .route("/:id/photo")
+  .put(protect, authorize("jobSeeker"), jobSeekerPhotoUpload);
+router
+  .route("/:id/cv")
+  .put(protect, authorize("jobSeeker"), jobSeekerCvUpload);
+router
+  .route("/:id/cv/:cv")
+  .delete(protect, authorize("jobSeeker"), deleteJobSeekerCv);
 
 router
   .route("/")
-  .get(advancedResults(JobSeeker, ['applications', 'user', 'alerts']), getJobSeekers)
-  .post(protect, createJobSeeker);
+  .get(
+    advancedResults(JobSeeker, ["applications", "user", "alerts"]),
+    getJobSeekers
+  )
+  .post(protect, authorize("jobSeeker"), createJobSeeker);
 
 router
   .route("/:id")
   .get(getJobSeeker)
-  .put(protect, updateJobSeeker)
-  .delete(protect, deleteJobSeeker);
+  .put(protect, authorize("jobSeeker"), updateJobSeeker)
+  .delete(protect, authorize("jobSeeker"), deleteJobSeeker);
 
 module.exports = router;

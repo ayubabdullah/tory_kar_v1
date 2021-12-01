@@ -17,23 +17,26 @@ const jobRouter = require("./job.route");
 const router = express.Router();
 
 const advancedResults = require("../middlewares/advancedResults");
-const { protect } = require("../middlewares/authHandler");
+const { protect, authorize } = require("../middlewares/authHandler");
 
 // Re-route into other resource routers
 router.use("/:jobProviderId/jobs", jobRouter);
 
-router.route("/:id/photo").put(protect, jobProviderPhotoUpload);
-router.route("/:id/approve").put(protect, approveJobProvider);
+router
+  .route("/:id/photo")
+  .put(protect, authorize("jobProvider"), jobProviderPhotoUpload);
+router
+  .route("/:id/approve")
+  .put(protect, authorize("admin"), approveJobProvider);
 router
   .route("/")
   .get(advancedResults(JobProvider, ["jobs", "user"]), getJobProviders)
-  .post(protect, createJobProvider);
+  .post(protect, authorize("jobProvider"), createJobProvider);
 
 router
   .route("/:id")
   .get(getJobProvider)
-  .put(protect, updateJobProvider)
-  .delete(protect, deleteJobProvider);
-
+  .put(protect, authorize("jobProvider"), updateJobProvider)
+  .delete(protect, authorize("jobProvider"), deleteJobProvider);
 
 module.exports = router;

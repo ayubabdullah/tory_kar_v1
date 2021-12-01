@@ -8,8 +8,10 @@ const router = express.Router({ mergeParams: true });
 
 const { protect } = require("../middlewares/authHandler");
 
-router.route("/").get(getAlerts).post(protect, addAlert);
+router.use(protect);
 
-router.route("/:id").delete(protect, deleteAlert);
+router.route("/").get(getAlerts).post(addAlert);
+
+router.route("/:id").delete(deleteAlert);
 
 module.exports = router;
