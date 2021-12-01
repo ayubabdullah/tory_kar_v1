@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const geocoder = require("../utils/geocoder");
 
 const JobSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
     trim: true,
-    required: [true, "Please add a course title"],
+    required: [true, "Please add a job name"],
   },
   salary: {
     type: Number,
