@@ -23,7 +23,7 @@ const { protect } = require("../middlewares/authHandler");
 router.use("/:jobProviderId/jobs", jobRouter);
 
 router.route("/:id/photo").put(protect, jobProviderPhotoUpload);
-
+router.route("/:id/approve").put(protect, approveJobProvider);
 router
   .route("/")
   .get(advancedResults(JobProvider, ["jobs", "user"]), getJobProviders)
@@ -33,7 +33,7 @@ router
   .route("/:id")
   .get(getJobProvider)
   .put(protect, updateJobProvider)
-  .put(protect, approveJobProvider)
   .delete(protect, deleteJobProvider);
+
 
 module.exports = router;
