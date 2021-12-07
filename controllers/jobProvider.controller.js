@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 const JobProvider = require("../models/JobProvider");
 const { unlink } = require("fs");
 const JobSeeker = require("../models/JobSeeker");
+const User = require("../models/User");
 
 // @desc      Get all jobProviders
 // @route     GET /api/v1/jobproviders
