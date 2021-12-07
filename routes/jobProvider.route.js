@@ -24,19 +24,19 @@ router.use("/:jobProviderId/jobs", jobRouter);
 
 router
   .route("/:id/photo")
-  .put(protect, authorize("jobProvider"), jobProviderPhotoUpload);
+  .put(protect, authorize("jobProvider", "admin"), jobProviderPhotoUpload);
 router
   .route("/:id/approve")
   .put(protect, authorize("admin"), approveJobProvider);
 router
   .route("/")
   .get(advancedResults(JobProvider, ["jobs", "user"]), getJobProviders)
-  .post(protect, authorize("jobProvider"), createJobProvider);
+  .post(protect, authorize("jobProvider", "admin"), createJobProvider);
 
 router
   .route("/:id")
   .get(getJobProvider)
-  .put(protect, authorize("jobProvider"), updateJobProvider)
-  .delete(protect, authorize("jobProvider"), deleteJobProvider);
+  .put(protect, authorize("jobProvider", "admin"), updateJobProvider)
+  .delete(protect, authorize("jobProvider", "admin"), deleteJobProvider);
 
 module.exports = router;

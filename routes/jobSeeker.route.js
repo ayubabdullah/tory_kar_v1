@@ -30,13 +30,13 @@ const { protect, authorize } = require("../middlewares/authHandler");
 
 router
   .route("/:id/photo")
-  .put(protect, authorize("jobSeeker"), jobSeekerPhotoUpload);
+  .put(protect, authorize("jobSeeker", "admin"), jobSeekerPhotoUpload);
 router
   .route("/:id/cv")
-  .put(protect, authorize("jobSeeker"), jobSeekerCvUpload);
+  .put(protect, authorize("jobSeeker", "admin"), jobSeekerCvUpload);
 router
   .route("/:id/cv/:cv")
-  .delete(protect, authorize("jobSeeker"), deleteJobSeekerCv);
+  .delete(protect, authorize("jobSeeker", "admin"), deleteJobSeekerCv);
 
 router
   .route("/")
@@ -44,12 +44,12 @@ router
     advancedResults(JobSeeker, ["applications", "user", "alerts"]),
     getJobSeekers
   )
-  .post(protect, authorize("jobSeeker"), createJobSeeker);
+  .post(protect, authorize("jobSeeker", "admin"), createJobSeeker);
 
 router
   .route("/:id")
   .get(getJobSeeker)
-  .put(protect, authorize("jobSeeker"), updateJobSeeker)
-  .delete(protect, authorize("jobSeeker"), deleteJobSeeker);
+  .put(protect, authorize("jobSeeker", "admin"), updateJobSeeker)
+  .delete(protect, authorize("jobSeeker", "admin"), deleteJobSeeker);
 
 module.exports = router;

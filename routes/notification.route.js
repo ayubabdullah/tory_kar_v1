@@ -7,7 +7,7 @@ const router = express.Router({ mergeParams: true });
 
 const { protect, authorize } = require("../middlewares/authHandler");
 router.use(protect);
-router.use(authorize("jobSeeker"));
+router.use(authorize("jobSeeker", "admin"));
 
 router.route("/").get(getNotifications);
 

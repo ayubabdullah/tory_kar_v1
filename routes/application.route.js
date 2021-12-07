@@ -23,12 +23,12 @@ router
     }),
     getApplications
   )
-  .post(authorize("jobSeeker"), addApplication);
+  .post(authorize("jobSeeker", "admin"), addApplication);
 
 router
   .route("/:id")
   .get(getApplication)
-  .put(authorize("jobSeeker"), updateApplication)
-  .delete(authorize("jobSeeker"), deleteApplication);
+  .put(authorize("jobSeeker", "admin"), updateApplication)
+  .delete(authorize("jobSeeker", "admin"), deleteApplication);
 
 module.exports = router;

@@ -28,12 +28,12 @@ router
     }),
     getJobs
   )
-  .post(protect, authorize("jobProvider"), addJob);
+  .post(protect, authorize("jobProvider", "admin"), addJob);
 
 router
   .route("/:id")
   .get(getJob)
-  .put(protect, authorize("jobProvider"), updateJob)
-  .delete(protect, authorize("jobProvider"), deleteJob);
+  .put(protect, authorize("jobProvider", "admin"), updateJob)
+  .delete(protect, authorize("jobProvider", "admin"), deleteJob);
 
 module.exports = router;
