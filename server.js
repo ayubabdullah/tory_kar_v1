@@ -14,7 +14,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const connectDB = require("./config/db");
 
 // Load env vars
-dotenv.config();
+dotenv.config();``
 
 const app = express();
 
@@ -28,7 +28,7 @@ connectDB()
       console.log(
         `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
       )
-    );
+    ); 
   })
   .catch((err) => console.log(err));
 
