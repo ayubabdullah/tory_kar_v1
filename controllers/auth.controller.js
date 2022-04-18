@@ -137,7 +137,13 @@ exports.checkSMS = asyncHandler(async (req, res, next) => {
     );
   }
   try {
-    await checkSMS({ phone: req.body.phone, code: req.body.code });
+    const response = await checkSMS({
+      phone: req.body.phone,
+      code: req.body.code,
+    });
+    if (!response.valid) {
+      return next(new ErrorResponse(`The verification code is incorrect`, 404));
+    }
     user.isVerified = true;
 
     await user.save();

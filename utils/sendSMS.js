@@ -8,7 +8,7 @@ const sendSMS = async ({ phone }) => {
     .services(serviceId)
     .verifications.create({ to: phone, channel: "sms" });
 
-  console.log("Message sent", message);
+  console.log("Message sent", message); 
 };
 
 module.exports = sendSMS;

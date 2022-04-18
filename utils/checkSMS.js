@@ -8,7 +8,7 @@ const checkSMS = async ({ phone, code }) => {
     .services(serviceId)
     .verificationChecks.create({ to: phone, code });
 
-  console.log(message);
+  return message;
 };
 
 module.exports = checkSMS;
