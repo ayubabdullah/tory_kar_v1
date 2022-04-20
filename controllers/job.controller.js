@@ -137,12 +137,12 @@ exports.updateJob = asyncHandler(async (req, res, next) => {
 // @route     DELETE /api/v1/jobs/:id
 // @access    Private
 exports.deleteJob = asyncHandler(async (req, res, next) => {
-  const jobProvider = await JobProvider.findOne({ user: req.user.id });
-  if (!jobProvider) {
-    return next(
-      new ErrorResponse(`No jobProvider with the id of ${req.user.id}`, 404)
-    );
-  }
+  // const jobProvider = await JobProvider.findOne({ user: req.user.id });
+  // if (!jobProvider) {
+  //   return next(
+  //     new ErrorResponse(`No jobProvider with the id of ${req.user.id}`, 404)
+  //   );
+  // }
   const job = await Job.findById(req.params.id);
 
   if (!job) {
@@ -152,17 +152,17 @@ exports.deleteJob = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure user is job owner
-  if (
-    job.jobProvider.toString() !== jobProvider._id &&
-    req.user.role !== "admin"
-  ) {
-    return next(
-      new ErrorResponse(
-        `User ${jobProvider._id} is not authorized to delete job ${job._id}`,
-        401
-      )
-    );
-  }
+  // if (
+  //   job.jobProvider.toString() !== jobProvider._id ||
+  //   req.user.role !== "admin"
+  // ) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${jobProvider._id} is not authorized to delete job ${job._id}`,
+  //       401
+  //     )
+  //   );
+  // }
 
   await job.remove();
 

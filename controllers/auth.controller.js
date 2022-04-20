@@ -6,6 +6,19 @@ const User = require("../models/User");
 const sendSMS = require("../utils/sendSMS");
 const checkSMS = require("../utils/checkSMS");
 
+// @desc      Get admins
+// @route     GET /api/v1/auth/admins
+// @access    Private
+exports.getAdmins = asyncHandler(async (req, res, next) => {
+  const admins = await User.find({
+    role: "admin",
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: admins,
+  });
+});
 // @desc      Register user
 // @route     POST /api/v1/auth/register
 // @access    Public

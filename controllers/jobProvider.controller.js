@@ -35,6 +35,24 @@ exports.getJobProvider = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: jobProvider });
 });
 
+// @desc      Get Logged jobProvider
+// @route     GET /api/v1/jobproviders/me
+// @access    Private
+exports.getCurrentJobProvider = asyncHandler(async (req, res, next) => {
+  const jobProvider = await JobProvider.find({ user: req.user.id }).populate([
+    "jobs",
+    "user",
+  ]);
+
+  if (!jobProvider) {
+    return next(
+      new ErrorResponse(`JobSeeker not found with id of ${req.user.id}`, 404)
+    );
+  }
+
+  res.status(200).json({ success: true, data: jobProvider });
+});
+
 // @desc      Create new jobProvider
 // @route     POST /api/v1/jobproviders
 // @access    Private

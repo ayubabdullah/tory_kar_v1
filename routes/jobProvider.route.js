@@ -7,6 +7,7 @@ const {
   deleteJobProvider,
   jobProviderPhotoUpload,
   approveJobProvider,
+  getCurrentJobProvider,
 } = require("../controllers/jobProvider.controller");
 
 const JobProvider = require("../models/JobProvider");
@@ -32,7 +33,9 @@ router
   .route("/")
   .get(advancedResults(JobProvider, ["jobs", "user"]), getJobProviders)
   .post(protect, authorize("jobProvider", "admin"), createJobProvider);
-
+router
+  .route("/me")
+  .get(protect, authorize("jobProvider", "admin"), getCurrentJobProvider);
 router
   .route("/:id")
   .get(getJobProvider)

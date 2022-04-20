@@ -14,7 +14,8 @@ const errorHandler = require("./middlewares/errorHandler");
 const connectDB = require("./config/db");
 
 // Load env vars
-dotenv.config();``
+dotenv.config();
+``;
 
 const app = express();
 
@@ -28,7 +29,7 @@ connectDB()
       console.log(
         `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
       )
-    ); 
+    );
   })
   .catch((err) => console.log(err));
 
@@ -36,12 +37,12 @@ connectDB()
 // const bootcamps = require("./routes/bootcamps");
 // const courses = require("./routes/courses");
 const auth = require("./routes/auth.route");
- const jobSeeker = require("./routes/jobSeeker.route");
- const jobProvider = require("./routes/jobProvider.route");
- const application = require("./routes/application.route");
- const job = require("./routes/job.route");
- const alert = require("./routes/alert.route");
- const notification = require("./routes/notification.route");
+const jobSeeker = require("./routes/jobSeeker.route");
+const jobProvider = require("./routes/jobProvider.route");
+const application = require("./routes/application.route");
+const job = require("./routes/job.route");
+const alert = require("./routes/alert.route");
+const notification = require("./routes/notification.route");
 
 // Body parser
 app.use(express.json());
@@ -86,11 +87,11 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/api/v1/bootcamps", bootcamps);
 // app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", auth);
- app.use("/api/v1/jobseekers", jobSeeker);
- app.use("/api/v1/jobproviders", jobProvider);
- app.use("/api/v1/applications", application);
- app.use("/api/v1/jobs", job);
- app.use("/api/v1/alerts", alert);
- app.use("/api/v1/notifications", notification);
+app.use("/api/v1/jobseekers", jobSeeker);
+app.use("/api/v1/jobproviders", jobProvider);
+app.use("/api/v1/applications", application);
+app.use("/api/v1/jobs", job);
+app.use("/api/v1/alerts", alert);
+app.use("/api/v1/notifications", notification);
 
 app.use(errorHandler);

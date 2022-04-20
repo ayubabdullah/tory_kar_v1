@@ -8,14 +8,15 @@ const {
   jobSeekerPhotoUpload,
   jobSeekerCvUpload,
   deleteJobSeekerCv,
+  getCurrentJobSeeker,
 } = require("../controllers/jobSeeker.controller");
 
 const JobSeeker = require("../models/JobSeeker");
 
 // Include other resource routers
- const applicationRouter = require("./application.route");
- const alertRouter = require("./alert.route");
- const notificationRouter = require("./notification.route");
+const applicationRouter = require("./application.route");
+const alertRouter = require("./alert.route");
+const notificationRouter = require("./notification.route");
 
 const router = express.Router();
 
@@ -23,10 +24,9 @@ const advancedResults = require("../middlewares/advancedResults");
 const { protect, authorize } = require("../middlewares/authHandler");
 
 // Re-route into other resource routers
- router.use("/:jobId/applications", applicationRouter);
- router.use("/:jobSeekerId/alerts", alertRouter);
- router.use("/:jobSeekerId/notifications", notificationRouter);
-
+router.use("/:jobId/applications", applicationRouter);
+router.use("/:jobSeekerId/alerts", alertRouter);
+router.use("/:jobSeekerId/notifications", notificationRouter);
 
 router
   .route("/:id/photo")
@@ -45,7 +45,9 @@ router
     getJobSeekers
   )
   .post(protect, authorize("jobSeeker", "admin"), createJobSeeker);
-
+router
+  .route("/me")
+  .get(protect, authorize("jobSeeker", "admin"), getCurrentJobSeeker);
 router
   .route("/:id")
   .get(getJobSeeker)

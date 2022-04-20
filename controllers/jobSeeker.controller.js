@@ -32,6 +32,25 @@ exports.getJobSeeker = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: jobSeeker });
 });
 
+// @desc      Get Logged jobSeeker
+// @route     GET /api/v1/jobseekers/me
+// @access    Private
+exports.getCurrentJobSeeker = asyncHandler(async (req, res, next) => {
+  const jobSeeker = await JobSeeker.find({user: req.user.id}).populate([
+    "applications",
+    "alerts",
+    "user",
+  ]);
+
+  if (!jobSeeker) {
+    return next(
+      new ErrorResponse(`JobSeeker not found with id of ${req.user.id}`, 404)
+    );
+  }
+
+  res.status(200).json({ success: true, data: jobSeeker });
+});
+
 // @desc      Create new jobSeeker
 // @route     POST /api/v1/jobseekers
 // @access    Private
