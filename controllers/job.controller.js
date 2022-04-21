@@ -109,8 +109,8 @@ exports.updateJob = asyncHandler(async (req, res, next) => {
 
   // Make sure user is job owner
   if (
-    job.jobProvider.toString() !== jobProvider._id &&
-    req.user.role !== "admin"
+    !(job.jobProvider.toString() !== jobProvider._id &&
+    req.user.role !== "admin")
   ) {
     return next(
       new ErrorResponse(
@@ -122,7 +122,7 @@ exports.updateJob = asyncHandler(async (req, res, next) => {
 
   job = await Job.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true,
+    runValidators: false,
   });
 
   job.save();

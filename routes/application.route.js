@@ -28,7 +28,7 @@ router
 router
   .route("/:id")
   .get(getApplication)
-  .put(authorize("jobSeeker", "admin"), updateApplication)
+  .put(authorize("jobProvider", "admin"), updateApplication)
   .delete(authorize("jobSeeker", "admin"), deleteApplication);
 
 module.exports = router;

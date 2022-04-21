@@ -36,7 +36,7 @@ exports.getJobSeeker = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/jobseekers/me
 // @access    Private
 exports.getCurrentJobSeeker = asyncHandler(async (req, res, next) => {
-  const jobSeeker = await JobSeeker.find({user: req.user.id}).populate([
+  const jobSeeker = await JobSeeker.find({ user: req.user.id }).populate([
     "applications",
     "alerts",
     "user",
@@ -248,7 +248,7 @@ exports.jobSeekerCvUpload = asyncHandler(async (req, res, next) => {
   if (file.size > process.env.MAX_FILE_UPLOAD) {
     return next(
       new ErrorResponse(
-        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
+        `Please upload a pdf less than ${process.env.MAX_FILE_UPLOAD}`,
         400
       )
     );
