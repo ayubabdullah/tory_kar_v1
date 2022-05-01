@@ -16,7 +16,7 @@ const JobProviderSchema = new mongoose.Schema(
       required: [true, "Please add your date of startup"],
     },
     fields: {
-      type: [String],
+      type: String,
       required: [true, "Please add a field"],
     },
     bio: {

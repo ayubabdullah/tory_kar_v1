@@ -34,11 +34,11 @@ const JobSeekerSchema = new mongoose.Schema(
       ],
     },
     skills: {
-      type: [String],
+      type: String,
       required: [true, "Please add at least one skill"],
     },
     languages: {
-      type: [String],
+      type: String,
       required: [true, "Please add at least one language"],
     },
     profileImage: {

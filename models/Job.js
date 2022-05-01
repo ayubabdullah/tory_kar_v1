@@ -47,6 +47,10 @@ const JobSchema = new mongoose.Schema({
     state: String,
     country: String,
   },
+  isDone: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

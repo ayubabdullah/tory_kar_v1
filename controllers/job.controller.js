@@ -21,7 +21,7 @@ exports.getJobs = asyncHandler(async (req, res, next) => {
           404
         )
       );
-    }
+    } 
     const jobs = await Job.find({
       jobProvider: req.params.jobProviderId,
     });
@@ -75,8 +75,9 @@ exports.addJob = asyncHandler(async (req, res, next) => {
 
   const job = await Job.create(req.body);
 
-  const alerts = await Alert.find({ title: job.title });
+  const alerts = await Alert.find({ title: job.name });
   alerts.forEach(alert => {
+    console.log(alert)
     addNotification(alert.jobSeeker, job._id)
   })
 

@@ -20,9 +20,29 @@ exports.getApplications = asyncHandler(async (req, res, next) => {
         )
       );
     }
-    
+
     const applications = await Application.find({
       jobSeeker: req.params.jobSeekerId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: applications.length,
+      data: applications,
+    });
+  } else if (req.params.jobId) {
+    const job = await Job.findById(req.params.jobId);
+
+    if (!job) {
+      return next(
+        new ErrorResponse(`No job with the id of ${req.params.jobId}`, 404)
+      );
+    }
+
+    const applications = await Application.find({
+      job: req.params.jobId,
+    }).populate({
+      path: "jobSeeker"
     });
 
     return res.status(200).json({
@@ -60,24 +80,18 @@ exports.getApplication = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/jobs/jobId/applications
 // @access    Private
 exports.addApplication = asyncHandler(async (req, res, next) => {
-  const jobSeeker = await JobSeeker.findOne({user: req.user.id});
+  const jobSeeker = await JobSeeker.findOne({ user: req.user.id });
 
   if (!jobSeeker) {
     return next(
-      new ErrorResponse(
-        `No jobSeeker with the id of ${req.user.id}`,
-        404
-      )
+      new ErrorResponse(`No jobSeeker with the id of ${req.user.id}`, 404)
     );
   }
   const job = await Job.findById(req.params.jobId);
 
   if (!job) {
     return next(
-      new ErrorResponse(
-        `No job with the id of ${req.params.jobId}`,
-        404
-      )
+      new ErrorResponse(`No job with the id of ${req.params.jobId}`, 404)
     );
   }
 
@@ -96,15 +110,15 @@ exports.addApplication = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/applications/:id
 // @access    Private
 exports.updateApplication = asyncHandler(async (req, res, next) => {
-  const jobSeeker = await JobSeeker.findOne({ user: req.user.id });
-  if (!jobSeeker) {
-    return next(
-      new ErrorResponse(
-        `No jobSeeker with the id of ${req.params.jobSeekerId}`,
-        404
-      )
-    );
-  }
+  // const jobSeeker = await JobSeeker.findOne({ user: req.user.id });
+  // if (!jobSeeker) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `No jobSeeker with the id of ${req.user.id}`,
+  //       404
+  //     )
+  //   );
+  // }
   let application = await Application.findById(req.params.id);
 
   if (!application) {
@@ -113,18 +127,18 @@ exports.updateApplication = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Make sure user is application owner
-  if (
-    application.jobSeeker.toString() !== jobSeeker.id &&
-    req.user.role !== "admin"
-  ) {
-    return next(
-      new ErrorResponse(
-        `User ${jobSeeker.id} is not authorized to update application ${application._id}`,
-        401
-      )
-    );
-  }
+  // // Make sure user is application owner
+  // if (
+  //   application.jobSeeker.toString() !== jobSeeker.id &&
+  //   req.user.role !== "admin"
+  // ) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${jobSeeker.id} is not authorized to update application ${application._id}`,
+  //       401
+  //     )
+  //   );
+  // }
 
   application = await Application.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
