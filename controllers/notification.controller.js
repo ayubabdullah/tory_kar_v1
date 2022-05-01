@@ -21,6 +21,8 @@ exports.getNotifications = asyncHandler(async (req, res, next) => {
 
   const notifications = await Notification.find({
     jobSeeker: req.params.jobSeekerId,
+  }).populate({
+    path: "job",
   });
 
   return res.status(200).json({
